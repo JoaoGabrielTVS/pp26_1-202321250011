@@ -14,6 +14,9 @@ public class GerenciaPolitico {
     public GerenciaPolitico() {
         this.politicos = new ArrayList<>(); // não pode recriar a cada cadastro
     }
+    public List<ColaboradorPolitico> get_politicos() {
+        return politicos;
+    }
 
     public void criar_politico(String nome, String partido, MediarDebate mediador) {
         ColaboradorPolitico novo_politico = new ColaboradorPolitico(nome, partido);

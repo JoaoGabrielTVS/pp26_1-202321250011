@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Observer.ObservadorEleitor;
+import Sistema.LogSistem;
+
 public class ColaboradorPolitico {
+
     private String nome;
     private String partido;
     private boolean inquiridor;
@@ -29,9 +32,11 @@ public class ColaboradorPolitico {
         eleitores.remove(eleitor);
     }
 
-    protected void notificarEleitores() {
+    // Recebe o log para que as notificações apareçam no histórico completo
+    // O Observer continua intacto: quem sabe a mensagem é o candidato, não o microfone
+    protected void notificarEleitores(LogSistem log) {
         for (ObservadorEleitor eleitor : eleitores) {
-            eleitor.atualizar("SEU CANDIDATO ESTÁ FALANDO: " + nome);
+            eleitor.atualizar("SEU CANDIDATO ESTÁ FALANDO: " + nome, log);
         }
     }
 
