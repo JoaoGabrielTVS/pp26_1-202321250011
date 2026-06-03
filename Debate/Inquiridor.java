@@ -8,6 +8,16 @@ public class Inquiridor extends ColaboradorPolitico {
         super(nome, partido);
     }
 
+    private Inquiridor(Inquiridor original) {
+        super(original); // copia nome, partido, eleitores
+    }
+
+    
+    @Override
+    public Inquiridor clonar() {
+        return new Inquiridor(this);
+    }
+
     public void escolha_inquirido(ColaboradorPolitico politico) {
         if (mediador != null && politico != null) {
             mediador.set_inquirido(politico);
@@ -15,27 +25,28 @@ public class Inquiridor extends ColaboradorPolitico {
     }
 
     public void perguntar(int tempo, LogSistem log) {
-        log.register_log(get_nome() + " está falando: PERGUNTA");
+        log.register_log("\n-------------------------");
         microfone.liga();
         log.register_log("Microfone aberto para pergunta!");
-
+        notificarEleitores(log);
+        log.register_log(get_nome() + " (" + get_partido() + ") está falando: PERGUNTA");
         microfone.passa_tempo(tempo);
-
         microfone.desliga();
-        log.register_log("Tempo de pergunta finalizado! Microfone desligado");
         log.register_log(get_nome() + " encerrou a fala");
+        log.register_log("Tempo de pergunta finalizado! Microfone desligado");
+        log.register_log("-------------------------");
     }
 
     public void replica(int tempo, LogSistem log) {
-        log.register_log(get_nome() + " está falando: RÉPLICA");
+        log.register_log("\n-------------------------");
         microfone.liga();
         log.register_log("Microfone aberto para replica!");
-
+        notificarEleitores(log);
+        log.register_log(get_nome() + " (" + get_partido() + ") está falando: RÉPLICA");
         microfone.passa_tempo(tempo);
-
         microfone.desliga();
-        log.register_log("Tempo de replica finalizado! Microfone desligado");
         log.register_log(get_nome() + " encerrou a fala");
+        log.register_log("Tempo de replica finalizado! Microfone desligado");
+        log.register_log("-------------------------");
     }
-    
 }

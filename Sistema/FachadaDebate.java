@@ -4,6 +4,7 @@ import Debate.ColaboradorPolitico;
 import Debate.MediarDebate;
 
 public class FachadaDebate {
+
     private static FachadaDebate instance;
     private static ConfiguraTempo config;
     private static MediarDebate mediador;
@@ -53,8 +54,8 @@ public class FachadaDebate {
         }
 
         mediador.set_inquiridor(escolhido);
-        log.register_log("Sorteio inquiridor realizado com sucesso. Politico sorteado: "
-                + escolhido.get_nome() + " do partido " + escolhido.get_partido());
+        log.register_log("Sorteio realizado! Inquiridor: "
+                + escolhido.get_nome() + " (" + escolhido.get_partido() + ")");
     }
 
     public static void escolher_inquirido(String nome, String partido) {
@@ -71,34 +72,30 @@ public class FachadaDebate {
         }
 
         mediador.get_inquiridor().escolha_inquirido(escolhido);
-        log.register_log("Inquirido escolhido foi " + escolhido.get_nome() + " do partido " + escolhido.get_partido());
+        log.register_log("Inquirido escolhido: " + escolhido.get_nome() + " (" + escolhido.get_partido() + ")");
     }
-    
+
     public static void listar_politicos_disponiveis() {
+        // CORRIGIDO: o inquiridor atual não aparece como opção de inquirido
+        String nomeInquiridor = (mediador.get_inquiridor() != null)
+                ? mediador.get_inquiridor().get_nome()
+                : "";
 
-        for (ColaboradorPolitico p :
-                gerenciador.get_politicos()) {
-
-            System.out.println(
-                "- " + p.get_nome()
-                + " | "
-                + p.get_partido());
+        for (ColaboradorPolitico p : gerenciador.get_politicos()) {
+            if (!p.get_nome().equals(nomeInquiridor)) {
+                System.out.println("- " + p.get_nome() + " | " + p.get_partido());
+            }
         }
     }
-    
+
     public static boolean todos_foram_inquiridores() {
-
-        for (ColaboradorPolitico p :
-                gerenciador.get_politicos()) {
-
+        for (ColaboradorPolitico p : gerenciador.get_politicos()) {
             if (!p.get_inquiridor()) {
                 return false;
             }
         }
-
         return true;
     }
-    
 
     public static void executar_debate(ConfiguraTempo config, LogSistem log) {
         mediador.debate(config, log);
@@ -107,9 +104,11 @@ public class FachadaDebate {
     public static ConfiguraTempo get_config() {
         return config;
     }
+
     public static GerenciaPolitico get_gerenciador() {
         return gerenciador;
     }
+
     public static LogSistem get_Log() {
         return log;
     }
