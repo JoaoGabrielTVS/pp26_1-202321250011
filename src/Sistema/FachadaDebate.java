@@ -1,0 +1,86 @@
+package Sistema;
+
+import java.util.Queue;
+
+import Debate.ColaboradorPolitico;
+import Debate.MediarDebate;
+
+public class FachadaDebate {
+
+    private static FachadaDebate instance;
+    private static ConfiguraTempo config;
+    private static MediarDebate mediador;
+    private static GerenciaPolitico gerenciador;
+    private static LogSistem log;
+
+    private FachadaDebate() {}
+
+    public static FachadaDebate get_instance() {
+        if (instance == null) {
+            instance = new FachadaDebate();
+            config = new ConfiguraTempo();
+            mediador = new MediarDebate();
+            gerenciador = new GerenciaPolitico();
+            log = LogSistem.get_instance("debate.log");
+            log.register_log("Instancia de log criada");
+        }
+        return instance;
+    }
+
+    public static void configuracao(int pergunta, int resposta, int replica, int treplica) {
+        config.set_temp_pergunta(pergunta);   log.register_log("tempo de pergunta setado " + pergunta);
+        config.set_temp_resposta(resposta);   log.register_log("tempo de resposta setado " + resposta);
+        config.set_temp_replica(replica);     log.register_log("tempo de replica setado " + replica);
+        config.set_temp_treplica(treplica);   log.register_log("tempo de treplica setado " + treplica);
+    }
+
+    public static void cadastrar_politicos(String nome, String partido, MediarDebate mediador) {
+        gerenciador.criar_politico(nome, partido, mediador);
+        log.register_log("Politico " + nome + " do partido " + partido + " cadastrado!");
+    }
+
+    public static void sorteio_inquiridor() {
+        ColaboradorPolitico escolhido = gerenciador.sortear_politico();
+        if (escolhido == null) { log.register_log("Nenhum politico disponível."); return; }
+        mediador.set_inquiridor(escolhido);
+        mediador.setTodosPoliticos(gerenciador.get_politicos());
+        log.register_log("Inquiridor: " + escolhido.get_nome() + " (" + escolhido.get_partido() + ")");
+    }
+
+    public static void escolher_inquirido(String nome, String partido) {
+        ColaboradorPolitico escolhido = gerenciador.obter_politico(nome, partido);
+        if (escolhido == null) { log.register_log("Político não encontrado."); return; }
+        if (mediador.get_inquiridor() == null) { log.register_log("Inquiridor não definido."); return; }
+        mediador.get_inquiridor().escolha_inquirido(escolhido);
+        log.register_log("Inquirido: " + escolhido.get_nome() + " (" + escolhido.get_partido() + ")");
+    }
+
+    public static void listar_politicos_disponiveis() {
+        String nomeInquiridor = (mediador.get_inquiridor() != null)
+                ? mediador.get_inquiridor().get_nome() : "";
+        for (ColaboradorPolitico p : gerenciador.get_politicos()) {
+            if (!p.get_nome().equals(nomeInquiridor))
+                System.out.println("- " + p.get_nome() + " | " + p.get_partido());
+        }
+    }
+
+    public static boolean todos_foram_inquiridores() {
+        for (ColaboradorPolitico p : gerenciador.get_politicos())
+            if (!p.get_inquiridor()) return false;
+        return true;
+    }
+
+    public static void executar_debate(ConfiguraTempo config, LogSistem log) {
+        mediador.debate(config, log);
+    }
+
+    public static boolean temSolicitacoesDR()                    { return mediador.temSolicitacoesDR(); }
+    public static Queue<ColaboradorPolitico> getFilaDR()         { return mediador.getFilaDR(); }
+    public static void processarDireitos(boolean[] concessoes)   { mediador.processarDireitos(concessoes, log); }
+
+    public static ConfiguraTempo get_config()        { return config; }
+    public static GerenciaPolitico get_gerenciador() { return gerenciador; }
+    public static LogSistem get_Log()                { return log; }
+    public static MediarDebate get_mediador()        { return mediador; }
+    public static void acessar_log()                 { System.out.println(log.get_log_register()); }
+}
